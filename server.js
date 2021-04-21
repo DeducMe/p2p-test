@@ -40,10 +40,6 @@ io.on('connection', client => {
             numClients = rooms.size - 2
         }
         console.log(rooms.size)
-        if (numClients === 0) {
-            client.emit('unknownGame')
-            return
-        }
 
         clientRooms[client.id] = roomName
 
