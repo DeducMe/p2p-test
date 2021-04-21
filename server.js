@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 const path = require('path');
 
-var http = require('http');
+var http = require('https');
 var server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
