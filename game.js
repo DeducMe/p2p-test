@@ -82,8 +82,8 @@ function gameLoop(state){
     if(!state) {
         return;
     }
-    for (let i = 1; i < state.players.length + 1; i++){
-        let player = state.players[i-1]
+    for (let i = 0; i < state.players.length; i++){
+        let player = state.players[i]
 
         player.pos.x += player.vel.x;
         player.pos.y += player.vel.y;
