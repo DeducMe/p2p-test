@@ -1,8 +1,9 @@
 var express = require('express');
 var app = express();
 const path = require('path');
-
 var http = require('https');
+
+app.set('port', (process.env.PORT || 5000));
 var server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
@@ -128,4 +129,4 @@ io.on('connection', client => {
 
 
 
-server.listen(3000);
+server.listen(5000);
