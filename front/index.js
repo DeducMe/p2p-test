@@ -2,6 +2,7 @@ const BG_COLOR = '#231f20';
 const SNAKE_COLOR = '#c2c2c2';
 const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 40;
+
 let SIZE;
 const socket = io('https://multiplayer-snake1.herokuapp.com/');
 
