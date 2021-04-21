@@ -87,11 +87,13 @@ io.on('connection', client => {
             return
         }
         let player = state[roomName].players.find(player => player.id === client.id)
-
-        const vel = getUpdatedVelocity(player.vel, keyCode);
-        if (vel) {
-            player.vel = vel
+        if (player){
+            const vel = getUpdatedVelocity(player.vel, keyCode);
+            if (vel) {
+                player.vel = vel
+            }
         }
+        
     }
 
     function startGameInterval(roomName){
