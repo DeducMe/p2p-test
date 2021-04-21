@@ -3,7 +3,7 @@ const SNAKE_COLOR = '#c2c2c2';
 const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 40;
 let SIZE;
-const socket = io('http://localhost:3000/');
+const socket = io('https://multiplayer-snake1.herokuapp.com/');
 
 socket.on('init', handleSocketInit);
 socket.on('gameState', handleGameState);
