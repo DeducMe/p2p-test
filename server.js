@@ -5,7 +5,7 @@ var http = require('http');
 var server = http.createServer(app);
 const io = require("socket.io")(server, {
     cors: {
-      origin: "http://127.0.0.1:5500",
+      origin: "https://multiplayer-snake1.herokuapp.com",
       methods: ["GET", "POST"],
       credentials: true,
     }
@@ -18,6 +18,7 @@ const {gameLoop, getUpdatedVelocity, joinNewPlayer} = require('./game')
 const { makeid } = require('./utils');
 const { FRAME_RATE } = require('./constants');
 
+app.get('/', (req, res) => res.send('Hello world!'))
 
 io.on('connection', client => {
     console.log('connected')
