@@ -1,8 +1,10 @@
 var express = require('express');
 var app = express();
+const path = require('path');
 
 var http = require('http');
 var server = http.createServer(app);
+app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
       origin: "https://multiplayer-snake1.herokuapp.com",
@@ -18,7 +20,7 @@ const {gameLoop, getUpdatedVelocity, joinNewPlayer} = require('./game')
 const { makeid } = require('./utils');
 const { FRAME_RATE } = require('./constants');
 
-app.get('/', (req, res) => res.send('Hello world!'))
+app.get('/', (req, res) => res.sendFile(path.resolve(__dirname, 'front', 'index.html')))
 
 io.on('connection', client => {
     console.log('connected')
