@@ -15,8 +15,6 @@ socket.on('unknwonGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 socket.on('updateLobbies', updateLobbies);
 
-
-
 const initialScreen = document.getElementById('initialScreen');
 const gameScreen = document.getElementById('gameScreen');
 const joinGameBtn = document.getElementById('joinGameBtn');

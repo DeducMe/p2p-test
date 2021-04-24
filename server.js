@@ -30,6 +30,7 @@ io.on('connection', client => {
     client.on('newGame', handleNewGame)
     client.on('joinGame', handleJoinGame)
     client.on('disconnectUser', handleDisconnectUser)
+    client.emit('updateLobbies', clientRooms);
 
     function handleJoinGame(roomName){
 
@@ -43,9 +44,6 @@ io.on('connection', client => {
         clientRooms[client.id] = roomName
 
         joinClient(client, roomName)
-
-        // startGameInterval(roomName)
-
     }
 
     function joinClient(client, roomName){
@@ -119,7 +117,6 @@ io.on('connection', client => {
     function emitGameOver(roomName, looser) {
         io.sockets.in(roomName)
         .emit('gameOver', JSON.stringify({looser}));
-
     }
 
 })

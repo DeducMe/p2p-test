@@ -111,8 +111,6 @@ function gameLoop(state){
                         item.snake.splice(collideIndex)
                         player.snake.push({...player.pos})
                     }
-                    
-
                 }
             }
         })
