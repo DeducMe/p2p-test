@@ -5,26 +5,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <section class="game-wrapper">
-        <div id="gameScreen">
+    <div class="container">
+        <section class="game-wrapper" id="gameScreen">
             <h1>Game code is: <span id="gameCodeDisplay"></span></h1>
             <canvas id="canvas"></canvas>
-        </div>
-    </section>
+        </section>
 
-    <section id="initialScreen">
-        
-        <form class="initial-form" id="initialForm" >
-            <button class="btn" id="newGameBtn">Start new game</button>
-            <label for="codeInput">code to connect</label>
-            <input type="text" name="codeInput" id="codeInput">
-            <button class="btn" id="joinGameBtn">Connect to game with code</button>
-
-        </form>
-
-    </section>
+        <section class="initial-screen" id="initialScreen">
+            <ul class="active-lobbies" id="activeLobbies">
+                
+            </ul>
+            <form class="initial-form" id="initialForm" >
+                <button class="btn" id="newGameBtn">Start new game</button>
+                <label for="codeInput">code to connect</label>
+                <input type="text" name="codeInput" id="codeInput">
+                <button class="btn" id="joinGameBtn">Connect to game with code</button>
+            </form>
+        </section>
+    </div>
 </body>
 <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
 

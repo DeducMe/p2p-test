@@ -35,8 +35,6 @@ function getRandomVelocity(){
         y: Math.floor(Math.random() * (2 - -1)) -1
     }
 
-    console.log(result)
-
     if (
         (result.x === 0 && result.y === 0) 
     ||  (result.x === 1 && result.y === 1)
@@ -65,7 +63,7 @@ function createNewSnake(state, id){
 function createEmptyState(){
     return {
         players: [],
-        food: {},
+        food: [],
         gridsize: GRID_SIZE,
     };
 }
@@ -92,21 +90,47 @@ function gameLoop(state){
             result = player.id
         }
 
-        // const collide = state.players.find((item)=>{
-        //     if(item.id !== player.id){
-                
+        // state.players.map((item)=>{
+        //     if (item.id !== player.id){
+        //         item.snake.map((part)=>{
+        //             if (player.snake.includes({x:part.x, y:part.y})){
+        //                 // player.snake.find((item)=>part.x === item.x && part.y === item.y)
+        //             }
+        //         })
         //     }
         // })
-        // if(collide){
 
-        // }
-    
-        if (player.pos.x === state.food.x && player.pos.y === state.food.y){
-            player.snake.push({...player.pos})
-            player.pos.x += player.vel.x;
-            player.pos.y += player.vel.y;
-            randomFood(state)
-        }
+        state.players.map((item)=>{
+            if (item.id !== player.id){
+                const collideIndex = item.snake.findIndex(item => player.pos.x === item.x && player.pos.y === item.y) 
+                if (collideIndex !== -1){
+                    if (collideIndex < 3){
+                        result = item.id
+                    }
+                    else {
+                        item.snake.splice(collideIndex)
+                        player.snake.push({...player.pos})
+                    }
+                    
+
+                }
+            }
+        })
+
+
+        state.food.map((foodItem)=>{
+            if (player.pos.x === foodItem.x && player.pos.y === foodItem.y){
+                player.snake.push({...player.pos})
+                player.pos.x += player.vel.x;
+                player.pos.y += player.vel.y;
+                if (state.players.length >= state.food.length)
+                {
+                    randomFood(state)
+                }
+                state.food.splice(state.food.findIndex((item) => item.x === foodItem.x && item.y === foodItem.y) ,1)
+                
+            }
+        })
     
         if(player.vel.x || player.vel.y){
             for (let cell of player.snake){
@@ -137,7 +161,7 @@ function randomFood(state){
         }
     }
 
-    state.food = food;
+    state.food.push(food);
 }
 
 function getUpdatedVelocity(vel, keyCode){

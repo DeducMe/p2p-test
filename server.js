@@ -25,7 +25,7 @@ app.get('/', (req, res) => res.sendFile(path.resolve(__dirname, 'front', 'index.
 
 io.on('connection', client => {
     console.log('connected')
-
+    
     client.on('keydown', handleKeyDown)
     client.on('newGame', handleNewGame)
     client.on('joinGame', handleJoinGame)
@@ -39,7 +39,6 @@ io.on('connection', client => {
         if (rooms.has(roomName)) {
             numClients = rooms.size - 2
         }
-        console.log(rooms.size)
 
         clientRooms[client.id] = roomName
 
@@ -55,7 +54,7 @@ io.on('connection', client => {
 
         client.join(roomName);
         client.emit('init', client.id);
-
+        io.emit('updateLobbies', clientRooms);
     }
 
     function handleNewGame(){
@@ -93,7 +92,7 @@ io.on('connection', client => {
     }
 
     function startGameInterval(roomName){
-        const intervalId = setInterval(() => {
+        setInterval(() => {
             let looser = gameLoop(state[roomName]);
             if(looser){
                 let looserNum = state[roomName].players.findIndex(player => player.id === looser)
@@ -113,6 +112,8 @@ io.on('connection', client => {
 
     function handleDisconnectUser(){
         client.leave(clientRooms[client.id]);
+        delete clientRooms[client.id]
+        io.emit('updateLobbies', clientRooms);
     }
 
     function emitGameOver(roomName, looser) {
