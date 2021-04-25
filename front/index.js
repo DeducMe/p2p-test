@@ -139,8 +139,6 @@ function handleTooManyPlayers(){
 }
 
 function reset() {
-    document.removeEventListener('keydown', snakeMovement);
-
     playerNumber = null;
     codeInput.value = "";
     callCodeDisplay.innerText = "";
