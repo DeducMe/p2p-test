@@ -4,8 +4,8 @@ const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 100;
 
 let SIZE;
-const socket = io('https://video-test-p2p.herokuapp.com/');
-// const socket = io('http://localhost:5000/');
+// const socket = io('https://video-test-p2p.herokuapp.com/');
+const socket = io('http://localhost:5000/');
 
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
@@ -23,6 +23,11 @@ const callCodeDisplay = document.getElementById('callCodeDisplay');
 const activeLobbies = document.getElementById('activeLobbies');
 const videoGrid = document.getElementById('video-grid')
 
+const muteBtn = document.getElementById('muteBtn');
+const videoMuteBtn = document.getElementById('videoMuteBtn');
+
+muteBtn.addEventListener('click', toggleMicro);
+videoMuteBtn.addEventListener('click', toggleVideo);
 
 newCallBtn.addEventListener('click', startNewCall);
 joinCallBtn.addEventListener('click', joinExistingCall);
@@ -35,6 +40,7 @@ const myVideo = document.createElement('video')
     myVideo.muted = true
 const peers = {}
 const myPeer = new Peer()
+let myStream
 
 function init(){
     initialScreen.style.display = 'none'
@@ -42,28 +48,29 @@ function init(){
     navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
-        }).then(stream => {
+    })
+    .then(stream => {
         addVideoStream(myVideo, stream)
-        
+        myStream = stream
+
         myPeer.on('call', call => {
             call.answer(stream)
             const video = document.createElement('video')
             call.on('stream', userVideoStream => {
-            addVideoStream(video, userVideoStream)
+                addVideoStream(video, userVideoStream)
             })
         })
         
         socket.on('user-connected', userId => {
-            console.log(userId)
-            connectToNewUser(userId, stream)
+            connectToNewUser(userId)
         })
         callActive = true
 
-        })
-        .catch(error => {
+    })
+    .catch(error => {
         reset();
-        alert('Вам нужно дать разрешение')
-        });
+        alert('Вам нужно дать разрешение на аудио и видео')
+    });
     
 }
 
@@ -78,21 +85,45 @@ myPeer.on('open', id => {
     
     console.log(id)
 })
+
+function toggleMicro(){
+    if (myStream.getTracks()[0].enabled){
+        myStream.getTracks()[0].enabled = false
+        return 
+    }
+    myStream.getTracks()[0].enabled = true
+    
+}
+function toggleVideo(){
+    if (myStream.getTracks()[1].enabled){
+        myStream.getTracks()[1].enabled = false
+        return 
+    }
+    myStream.getTracks()[1].enabled = true
+
+}
   
-function connectToNewUser(userId, stream) {
-    const call = myPeer.call(userId, stream)
+function connectToNewUser(userId) {
     const video = document.createElement('video')
-    call.on('stream', userVideoStream => {
-        console.log('added')
-        addVideoStream(video, userVideoStream)
-    })
-    call.on('close', () => {
-        console.log('removed')
 
-        video.remove()
-    })
+    let recconectInterval = setInterval(()=>{
+        console.log('try connection')
+        const call = myPeer.call(userId, myStream)
 
-    peers[userId] = call
+        call.on('stream', userVideoStream => {
+            console.log('added')
+            clearInterval(recconectInterval);
+            addVideoStream(video, userVideoStream)
+        })
+        call.on('close', () => {
+            console.log('removed')
+            clearInterval(recconectInterval);
+            video.remove()
+        })
+        peers[userId] = call
+
+    }, 1000)
+
 }
   
 function addVideoStream(video, stream) {

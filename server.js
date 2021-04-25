@@ -8,7 +8,8 @@ var server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
-      origin: "https://video-test-p2p.herokuapp.com/",
+    //   origin: "https://video-test-p2p.herokuapp.com/",
+      origin: "http://localhost:5000/",
       methods: ["GET", "POST"],
       credentials: true,
     }
@@ -74,9 +75,6 @@ io.on('connection', client => {
         clientRooms[userId] = roomName;
 
         joinClient(client, roomName)
-
-        startCallInterval(roomName)
-
     }
 
     function handleKeyDown(keyCode){
@@ -100,10 +98,6 @@ io.on('connection', client => {
                 player.vel = vel
             }
         }
-        
-    }
-
-    function startCallInterval(roomName){
         
     }
 })
