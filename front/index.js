@@ -41,7 +41,6 @@ function init(){
     callScreen.style.display = 'block'
 
     navigator.mediaDevices.getUserMedia({
-        audio: true
       }).then(stream => {
         addVideoStream(myVideo, stream)
       
