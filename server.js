@@ -8,7 +8,7 @@ var server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
-      origin: "https://localhost:5000",
+      origin: "https://git.heroku.com/video-test-p2p.git",
       methods: ["GET", "POST"],
       credentials: true,
     }

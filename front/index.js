@@ -4,8 +4,8 @@ const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 100;
 
 let SIZE;
-// const socket = io('https://multiplayer-snake1.herokuapp.com/');
-const socket = io('http://localhost:5000/');
+const socket = io('https://git.heroku.com/video-test-p2p.git');
+// const socket = io('http://localhost:5000/');
 
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
