@@ -9,9 +9,9 @@
 </head>
 <body>
     <div class="container">
-        <section class="game-wrapper" id="gameScreen">
-            <h1>Game code is: <span id="gameCodeDisplay"></span></h1>
-            <canvas id="canvas"></canvas>
+        <section class="call-wrapper" id="callScreen">
+            <h1>Call code is: <span id="callCodeDisplay"></span></h1>
+            <div id="video-grid"></div>
         </section>
 
         <section class="initial-screen" id="initialScreen">
@@ -19,14 +19,15 @@
                 
             </ul>
             <form class="initial-form" id="initialForm" >
-                <button class="btn" id="newGameBtn">Start new game</button>
+                <button class="btn" id="newCallBtn">Start new call</button>
                 <label for="codeInput">code to connect</label>
                 <input type="text" name="codeInput" id="codeInput">
-                <button class="btn" id="joinGameBtn">Connect to game with code</button>
+                <button class="btn" id="joinCallBtn">Connect to call with code</button>
             </form>
         </section>
     </div>
 </body>
+<script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
 <script src="https://cdn.socket.io/socket.io-3.0.0.js"></script>
 
 <script src="index.js"></script>

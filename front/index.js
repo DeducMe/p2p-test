@@ -4,112 +4,133 @@ const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 100;
 
 let SIZE;
-const socket = io('https://multiplayer-snake1.herokuapp.com/');
-// const socket = io('http://localhost:5000/');
+// const socket = io('https://multiplayer-snake1.herokuapp.com/');
+const socket = io('http://localhost:5000/');
 
 socket.on('init', handleSocketInit);
-socket.on('gameState', handleGameState);
-socket.on('gameOver', handleGameOver);
-socket.on('gameCode', handleGameCode);
-socket.on('unknwonGame', handleUnknownGame);
+socket.on('callState', handleCallState);
+socket.on('callOver', handleCallOver);
+socket.on('callCode', handleCallCode);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 socket.on('updateLobbies', updateLobbies);
 
 const initialScreen = document.getElementById('initialScreen');
-const gameScreen = document.getElementById('gameScreen');
-const joinGameBtn = document.getElementById('joinGameBtn');
-const newGameBtn = document.getElementById('newGameBtn');
+const callScreen = document.getElementById('callScreen');
+const joinCallBtn = document.getElementById('joinCallBtn');
+const newCallBtn = document.getElementById('newCallBtn');
 const codeInput = document.getElementById('codeInput');
-const gameCodeDisplay = document.getElementById('gameCodeDisplay');
+const callCodeDisplay = document.getElementById('callCodeDisplay');
 const activeLobbies = document.getElementById('activeLobbies');
-
-newGameBtn.addEventListener('click', startNewGame);
-joinGameBtn.addEventListener('click', joinExistingGame);
+const videoGrid = document.getElementById('video-grid')
 
 
+newCallBtn.addEventListener('click', startNewCall);
+joinCallBtn.addEventListener('click', joinExistingCall);
+
+let userId
 let canvas, ctx;
 let playerNumber;
-let gameActive = false;
+let callActive = false;
+const myVideo = document.createElement('video')
+    myVideo.muted = true
+const peers = {}
+const myPeer = new Peer()
 
 function init(){
     initialScreen.style.display = 'none'
-    gameScreen.style.display = 'block'
+    callScreen.style.display = 'block'
 
-    canvas = document.getElementById('canvas');
-    ctx = canvas.getContext('2d');
+    navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      }).then(stream => {
+        addVideoStream(myVideo, stream)
+      
+        myPeer.on('call', call => {
+          call.answer(stream)
+          const video = document.createElement('video')
+          call.on('stream', userVideoStream => {
+            addVideoStream(video, userVideoStream)
+          })
+        })
+      
+        socket.on('user-connected', userId => {
+            console.log(userId)
+            connectToNewUser(userId, stream)
+        })
+      })
 
-    canvas.width = canvas.height = 800;
-    SIZE = canvas.width / GRID_SIZE;
-
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    document.addEventListener('keydown', snakeMovement);
-
-    gameActive = true
+    callActive = true
 }
 
-function snakeMovement(e){
+socket.on('userDisconnect', userId => {
+    console.log(userId, peers[userId])
+    peers[userId]?.close()
+})
 
-    socket.emit('keydown', e.keyCode)
-}
+myPeer.on('open', id => {
+    userId = id
+    socket.emit('openConnection', id)
+    
+    console.log(id)
+})
+  
+function connectToNewUser(userId, stream) {
+    const call = myPeer.call(userId, stream)
+    const video = document.createElement('video')
+    call.on('stream', userVideoStream => {
+        console.log('added')
+        addVideoStream(video, userVideoStream)
+    })
+    call.on('close', () => {
+        console.log('removed')
 
-function paintGame(state){
-    ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const food = state.food;
-    food.map((food) => {
-        ctx.fillStyle = FOOD_COLOR;
-        ctx.fillRect(food.x * SIZE, food.y * SIZE, SIZE, SIZE);
+        video.remove()
     })
 
-    state.players.map((player)=>{
-        paintPlayer(player, player.snakeColor)
-    })
+    peers[userId] = call
 }
-
-function paintPlayer(player, color){
-    const snake = player.snake;
-
-    ctx.fillStyle = color;
-
-    for (let cell of snake){
-        ctx.fillRect(cell.x * SIZE, cell.y * SIZE, SIZE, SIZE);
-    }
+  
+function addVideoStream(video, stream) {
+    video.srcObject = stream
+    video.addEventListener('loadedmetadata', () => {
+        video.play()
+    })
+    videoGrid.append(video)
 }
 
 function handleSocketInit(number){
     playerNumber = number;
 }
 
-function handleGameState(gameState){
-    if (!gameActive) return
+function handleCallState(callState){
+    if (!callActive) return
 
-    gameState = JSON.parse(gameState);
-    requestAnimationFrame(() => paintGame(gameState))
+    callState = JSON.parse(callState);
+    requestAnimationFrame(() => paintCall(callState))
 }
 
-function handleGameOver(data){
-    if (!gameActive) return
+function handleCallOver(data){
+    if (!callActive) return
 
     data = JSON.parse(data);
     console.log(data, playerNumber)
     if (data.looser === playerNumber){
-        gameActive = false
+        callActive = false
         socket.emit('disconnectUser')
         reset();
     }
 
 }
 
-function handleUnknownGame(){
+function handleUnknownCall(){
     reset();
-    alert("Unknown game code")
+    alert("Unknown call code")
 }
 
 function handleTooManyPlayers(){
     reset();
-    alert("game is already going")
+    alert("call is already going")
     
 }
 
@@ -118,31 +139,31 @@ function reset() {
 
     playerNumber = null;
     codeInput.value = "";
-    gameCodeDisplay.innerText = "";
+    callCodeDisplay.innerText = "";
     initialScreen.style.display = "block";
-    gameScreen.style.display = "none"
+    callScreen.style.display = "none"
 }
 
-function handleGameCode(gameCode){
-    gameCodeDisplay.innerText = gameCode
+function handleCallCode(callCode){
+    callCodeDisplay.innerText = callCode
 }
 
-function startNewGame(e){
+function startNewCall(e){
     e.preventDefault()
 
-    socket.emit('newGame')
+    socket.emit('newCall')
     init()
 }
 
-function joinGameByLobby(lobbyName){
-    socket.emit('joinGame', lobbyName)
+function joinCallByLobby(lobbyName){
+    socket.emit('joinCall', lobbyName, userId)
     init()
 }
 
-function joinExistingGame(e){
+function joinExistingCall(e){
     e.preventDefault()
     const code = codeInput.value
-    socket.emit('joinGame', code)
+    socket.emit('joinCall', code)
     init()
 }
 
@@ -155,7 +176,7 @@ function updateLobbies(lobbiesData){
     }
     Object.keys(result).forEach((key) => {
         lobbiesField +=
-        `<li onclick="joinGameByLobby('${key}')">
+        `<li onclick="joinCallByLobby('${key}')">
             <span>${key}</span>
             <span>${result[key].length}</span>
         </li>`

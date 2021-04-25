@@ -1,8 +1,8 @@
-.game-wrapper{
+.call-wrapper{
     display: none;
 }
 
-.game-wrapper,
+.call-wrapper,
 .initial-screen{
     margin: 0 auto
 }

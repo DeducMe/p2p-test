@@ -8,7 +8,7 @@ var server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
-      origin: "https://multiplayer-snake1.herokuapp.com",
+      origin: "https://localhost:5000",
       methods: ["GET", "POST"],
       credentials: true,
     }
@@ -17,23 +17,25 @@ const io = require("socket.io")(server, {
 let state = {}
 let clientRooms = {}
 
-const {gameLoop, getUpdatedVelocity, joinNewPlayer} = require('./game')
 const { makeid } = require('./utils');
-const { FRAME_RATE } = require('./constants');
 
 app.get('/', (req, res) => res.sendFile(path.resolve(__dirname, 'front', 'index.html')))
 
 io.on('connection', client => {
     console.log('connected')
-    
+    let userId
+    client.on('disconnect', handleDisconnectUser)
+    client.on('openConnection', setId)
     client.on('keydown', handleKeyDown)
-    client.on('newGame', handleNewGame)
-    client.on('joinGame', handleJoinGame)
-    client.on('disconnectUser', handleDisconnectUser)
+    client.on('newCall', handleNewCall)
+    client.on('joinCall', handleJoinCall)
     client.emit('updateLobbies', clientRooms);
 
-    function handleJoinGame(roomName){
+    function setId(id){
+        userId = id
 
+    }
+    function handleJoinCall(roomName, userId){
         const rooms = io.sockets.adapter.rooms
         let numClients = 0;
 
@@ -41,32 +43,44 @@ io.on('connection', client => {
             numClients = rooms.size - 2
         }
 
-        clientRooms[client.id] = roomName
+        clientRooms[userId] = roomName
 
         joinClient(client, roomName)
     }
 
     function joinClient(client, roomName){
-        state[roomName] = joinNewPlayer(state[roomName], client.id)
-        client.emit('gameCode', roomName)
+        client.emit('callCode', roomName)
 
+        io.sockets.in(roomName)
+        .emit('user-connected', userId);
         client.join(roomName);
-        client.emit('init', client.id);
+        client.emit('init', userId);
         io.emit('updateLobbies', clientRooms);
     }
 
-    function handleNewGame(){
+    function handleDisconnectUser(){
+        client.leave(clientRooms[userId]);
+
+        io.sockets.in(clientRooms[userId])
+        .emit('userDisconnect', userId);
+        console.log(clientRooms, userId)
+        delete clientRooms[userId]
+        io.emit('updateLobbies', clientRooms);
+
+    }
+
+    function handleNewCall(){
         let roomName = makeid(5);
-        clientRooms[client.id] = roomName;
+        clientRooms[userId] = roomName;
 
         joinClient(client, roomName)
 
-        startGameInterval(roomName)
+        startCallInterval(roomName)
 
     }
 
     function handleKeyDown(keyCode){
-        const roomName = clientRooms[client.id]
+        const roomName = clientRooms[userId]
 
         if (!roomName){
             return
@@ -79,7 +93,7 @@ io.on('connection', client => {
             console.error(e)
             return
         }
-        let player = state[roomName].players.find(player => player.id === client.id)
+        let player = state[roomName].players.find(player => player.id === userId)
         if (player){
             const vel = getUpdatedVelocity(player.vel, keyCode);
             if (vel) {
@@ -89,36 +103,9 @@ io.on('connection', client => {
         
     }
 
-    function startGameInterval(roomName){
-        setInterval(() => {
-            let looser = gameLoop(state[roomName]);
-            if(looser){
-                let looserNum = state[roomName].players.findIndex(player => player.id === looser)
-
-                emitGameOver(roomName, looser)
-                state[roomName].players.splice(looserNum, 1)
-            }
-            emitGameState(roomName, state[roomName])
-        }, 1000 / FRAME_RATE)
+    function startCallInterval(roomName){
+        
     }
-    
-    function emitGameState(roomName, gameState) {
-        io.sockets.in(roomName)
-        .emit('gameState', JSON.stringify(gameState));
-
-    }
-
-    function handleDisconnectUser(){
-        client.leave(clientRooms[client.id]);
-        delete clientRooms[client.id]
-        io.emit('updateLobbies', clientRooms);
-    }
-
-    function emitGameOver(roomName, looser) {
-        io.sockets.in(roomName)
-        .emit('gameOver', JSON.stringify({looser}));
-    }
-
 })
 
 
