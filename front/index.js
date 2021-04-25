@@ -4,8 +4,8 @@ const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 100;
 
 let SIZE;
-const socket = io('https://video-test-p2p.herokuapp.com/');
-// const socket = io('http://localhost:5000/');
+// const socket = io('https://video-test-p2p.herokuapp.com/');
+const socket = io('http://localhost:5000/');
 
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
@@ -42,34 +42,38 @@ const peers = {}
 const myPeer = new Peer()
 let myStream
 
+function createStream(stream){
+    addVideoStream(myVideo, stream)
+    myStream = stream
+
+    myPeer.on('call', call => {
+        call.answer(stream)
+        const video = document.createElement('video')
+        call.on('stream', userVideoStream => {
+            addVideoStream(video, userVideoStream)
+        })
+    })
+    
+    socket.on('user-connected', userId => {
+        connectToNewUser(userId)
+    })
+    callActive = true
+}
+
 function init(){
     initialScreen.style.display = 'none'
     callScreen.style.display = 'block'
+    const emptyMediaStream = new MediaStream([createEmptyAudioTrack(), createEmptyVideoTrack({ width:640, height:480 })]);
+
     navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
     })
     .then(stream => {
-        addVideoStream(myVideo, stream)
-        myStream = stream
-
-        myPeer.on('call', call => {
-            call.answer(stream)
-            const video = document.createElement('video')
-            call.on('stream', userVideoStream => {
-                addVideoStream(video, userVideoStream)
-            })
-        })
-        
-        socket.on('user-connected', userId => {
-            connectToNewUser(userId)
-        })
-        callActive = true
-
+        createStream(stream)
     })
     .catch(error => {
-        reset();
-        alert('Вам нужно дать разрешение на аудио и видео')
+        createStream(emptyMediaStream)
     });
     
 }
@@ -102,6 +106,25 @@ function toggleVideo(){
     myStream.getTracks()[1].enabled = true
 
 }
+
+function createEmptyAudioTrack(){
+    const ctx = new AudioContext();
+    const oscillator = ctx.createOscillator();
+    const dst = oscillator.connect(ctx.createMediaStreamDestination());
+    oscillator.start();
+    const track = dst.stream.getAudioTracks()[0];
+    return Object.assign(track, { enabled: false });
+};
+
+function createEmptyVideoTrack({ width, height }){
+    const canvas = Object.assign(document.createElement('canvas'), { width, height });
+    canvas.getContext('2d').fillRect(0, 0, width, height);
+  
+    const stream = canvas.captureStream();
+    const track = stream.getVideoTracks()[0];
+  
+    return Object.assign(track, { enabled: false });
+};
   
 function connectToNewUser(userId) {
     const video = document.createElement('video')
@@ -122,7 +145,7 @@ function connectToNewUser(userId) {
         })
         peers[userId] = call
 
-    }, 1000)
+    }, 3000)
 
 }
   
