@@ -39,34 +39,31 @@ const myPeer = new Peer()
 function init(){
     initialScreen.style.display = 'none'
     callScreen.style.display = 'block'
-    try{
-        navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-          }).then(stream => {
-            addVideoStream(myVideo, stream)
-          
-            myPeer.on('call', call => {
-              call.answer(stream)
-              const video = document.createElement('video')
-              call.on('stream', userVideoStream => {
-                addVideoStream(video, userVideoStream)
-              })
+    navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+        }).then(stream => {
+        addVideoStream(myVideo, stream)
+        
+        myPeer.on('call', call => {
+            call.answer(stream)
+            const video = document.createElement('video')
+            call.on('stream', userVideoStream => {
+            addVideoStream(video, userVideoStream)
             })
-          
-            socket.on('user-connected', userId => {
-                console.log(userId)
-                connectToNewUser(userId, stream)
-            })
-          })
-    
+        })
+        
+        socket.on('user-connected', userId => {
+            console.log(userId)
+            connectToNewUser(userId, stream)
+        })
         callActive = true
-    }
-    catch{
+
+        })
+        .catch(error => {
         reset();
         alert('Вам нужно дать разрешение')
-
-    }
+        });
     
 }
 
