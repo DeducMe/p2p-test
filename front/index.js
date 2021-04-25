@@ -4,8 +4,8 @@ const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 100;
 
 let SIZE;
-const socket = io('https://video-test-p2p.herokuapp.com/');
-// const socket = io('http://localhost:5000/');
+// const socket = io('https://video-test-p2p.herokuapp.com/');
+const socket = io('http://localhost:5000/');
 
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
@@ -25,9 +25,12 @@ const videoGrid = document.getElementById('video-grid')
 
 const muteBtn = document.getElementById('muteBtn');
 const videoMuteBtn = document.getElementById('videoMuteBtn');
+const userMediaForm = document.getElementById('userMediaForm');
+
 
 muteBtn.addEventListener('click', toggleMicro);
 videoMuteBtn.addEventListener('click', toggleVideo);
+userMediaForm.addEventListener('submit', connectToLobby);
 
 newCallBtn.addEventListener('click', startNewCall);
 joinCallBtn.addEventListener('click', joinExistingCall);
@@ -40,9 +43,10 @@ const myVideo = document.createElement('video')
     myVideo.muted = true
 const peers = {}
 const myPeer = new Peer()
-let myStream
+let usersInRoom = []
+let myStream, connectedDevices, devicesState
 
-function createStream(stream){
+function createStream(stream, recall){
     addVideoStream(myVideo, stream)
     myStream = stream
 
@@ -55,22 +59,30 @@ function createStream(stream){
     })
     
     socket.on('user-connected', userId => {
+        usersInRoom.push(userId)
         connectToNewUser(userId)
     })
+
     callActive = true
+    if (!devicesState.video) toggleVideo()
+    if (!devicesState.audio) toggleMicro()
+
+    if (recall) usersInRoom.forEach((id)=>{
+        connectToNewUser(id)
+    })
 }
 
-function init(){
-    initialScreen.style.display = 'none'
-    callScreen.style.display = 'block'
+function askForDevice(recall){
     const emptyMediaStream = new MediaStream([createEmptyAudioTrack(), createEmptyVideoTrack({ width:640, height:480 })]);
-
+    
     navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true
     })
     .then(stream => {
-        createStream(stream)
+        connectedDevices.audio = true
+        connectedDevices.video = true
+        createStream(stream, recall)
         return
     })
     .catch(error => {
@@ -78,18 +90,45 @@ function init(){
             audio: true
         })
         .then(stream => {
-            createStream(stream)
+            connectedDevices.audio = true
+            connectedDevices.video = false
+            createStream(stream, recall)
             return
         })
         .catch(error => {
-            createStream(emptyMediaStream)
+            connectedDevices.audio = false
+            connectedDevices.video = false
+            createStream(emptyMediaStream, recall)
         });
     });
+}
+
+function connectToLobby(e){
+    e.preventDefault()
+    connectedDevices = {
+        video: userMediaForm.videoState.checked,
+        audio: userMediaForm.microState.checked
+    }
+    devicesState = {
+        video: userMediaForm.videoState.checked,
+        audio: userMediaForm.microState.checked
+    }
+
+    askForDevice()
     
+}
+
+function init(){
+    initialScreen.style.display = 'none'
+    callScreen.style.display = 'block'
+    userMediaForm.style.display = 'block'
 }
 
 socket.on('userDisconnect', userId => {
     console.log(userId, peers[userId])
+    console.log(usersInRoom)
+    usersInRoom.splice(usersInRoom.findIndex((id)=>id===userId), 1)
+
     peers[userId]?.close()
 })
 
@@ -101,20 +140,33 @@ myPeer.on('open', id => {
 })
 
 function toggleMicro(){
-    if (myStream.getTracks()[0].enabled){
-        myStream.getTracks()[0].enabled = false
+    micro = myStream.getTracks().find((item)=>item.kind === 'audio')
+    if (!micro){
+        connectedDevices.audio = true
+        askForDevice(true)
+        return
+    }
+
+    if (micro.enabled){
+        micro.enabled = false
         return 
     }
-    myStream.getTracks()[0].enabled = true
-
+    micro.enabled = true
+    
 }
 function toggleVideo(){
-    if (myStream.getTracks()[1].enabled){
-        myStream.getTracks()[1].enabled = false
+    video = myStream.getTracks().find((item)=>item.kind === 'video')
+    if (!video){
+        connectedDevices.video = true
+        askForDevice(true)
+        return
+    }
+
+    if (video.enabled){
+        video.enabled = false
         return 
     }
-    myStream.getTracks()[1].enabled = true
-
+    video.enabled = true
 }
 
 function createEmptyAudioTrack(){

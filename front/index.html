@@ -13,8 +13,20 @@
             <h1>Call code is: <span id="callCodeDisplay"></span></h1>
             <div id="video-grid"></div>
 
-            <button class="btn" id="muteBtn">mute micro</button>
-            <button class="btn" id="videoMuteBtn">mute video</button>
+            <div class="call-controls">
+                <button class="btn" id="muteBtn">mute micro</button>
+                <button class="btn" id="videoMuteBtn">mute video</button>
+            </div>
+            
+            <form id="userMediaForm" class="popup">
+                <input type="checkbox" name="microState">
+                <label for="microState">Micro</label>
+
+                <input type="checkbox" name="videoState">
+                <label for="videoState">Video</label>
+
+                <button>Connect</button>
+            </form>
         </section>
 
         <section class="initial-screen" id="initialScreen">
@@ -28,6 +40,7 @@
                 <button class="btn" id="joinCallBtn">Connect to call with code</button>
             </form>
         </section>
+
     </div>
 </body>
 <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
