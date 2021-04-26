@@ -21,6 +21,8 @@
 
     border: 2px solid #000;
     background: white;
+
+    overflow: scroll;
 }
 
 
@@ -384,6 +386,11 @@ video {
     .active-lobbies,
     .initial-form{
         width: 100%;
+    }
+
+    #muteBtn,
+    #videoMuteBtn{
+        background-color: #fff;
     }
 
 }
