@@ -176,6 +176,10 @@
     margin: 0 auto
 }
 
+#videoMuteBtn{
+    margin-left: 20px;
+}
+
 #muteBtn,
 #videoMuteBtn{
     position: relative;
