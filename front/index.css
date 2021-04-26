@@ -393,6 +393,10 @@ video {
         background-color: #fff;
     }
 
+    #videoMuteBtn{
+        margin-left: 10px;
+    }
+
     .sup-btn-circled{
         font-size: 20px;
         font-weight: 700;
