@@ -26,6 +26,7 @@ io.on('connection', client => {
     console.log('connected')
     let userId
     client.on('disconnect', handleDisconnectUser)
+    client.on('disconnectUser', handleDisconnectUser)
     client.on('openConnection', setId)
     client.on('keydown', handleKeyDown)
     client.on('newCall', handleNewCall)
@@ -67,7 +68,6 @@ io.on('connection', client => {
         console.log(clientRooms, userId)
         delete clientRooms[userId]
         io.emit('updateLobbies', clientRooms);
-
     }
 
     function handleNewCall(){

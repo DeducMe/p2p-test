@@ -5,42 +5,68 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="./Nunito/Nunito.css">
+    <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./global.css">
+
 </head>
 <body>
-    <div class="container">
-        <section class="call-wrapper" id="callScreen">
-            <h1>Call code is: <span id="callCodeDisplay"></span></h1>
-            <div id="video-grid"></div>
-
-            <div class="call-controls">
-                <button class="btn" id="muteBtn">mute micro</button>
-                <button class="btn" id="videoMuteBtn">mute video</button>
-            </div>
-            
-            <form id="userMediaForm" class="popup">
-                <input type="checkbox" name="microState">
-                <label for="microState">Micro</label>
-
-                <input type="checkbox" name="videoState">
-                <label for="videoState">Video</label>
-
-                <button>Connect</button>
-            </form>
-        </section>
-
-        <section class="initial-screen" id="initialScreen">
-            <ul class="active-lobbies" id="activeLobbies">
+    <div class="wrap">
+        <div class="container popup-wrapper rounded">
+            <section id="callScreen" class="call-wrapper" >
+                <h2 class="semi">Call code is: <span class="f-large bold" id="callCodeDisplay"></span></h2>
+                <div id="video-grid"></div>
+                <div class="call-controls">
+                    <button class="sup-btn-circled" id="muteBtn"><img src="./img/microphone.svg" alt="microphone"></button>
+                    <button class="sup-btn-circled" id="videoMuteBtn"><img src="./img/video-camera.svg" alt="video"></button>
+                </div>
                 
-            </ul>
-            <form class="initial-form" id="initialForm" >
-                <button class="btn" id="newCallBtn">Start new call</button>
-                <label for="codeInput">code to connect</label>
-                <input type="text" name="codeInput" id="codeInput">
-                <button class="btn" id="joinCallBtn">Connect to call with code</button>
-            </form>
-        </section>
+            </section>
+            
+            <form id="userMediaForm" class="form">
+                <div class="flex">
+                    <div class="checkbox">
+                        <input class="inp-cbx" id="microState" name="microState" type="checkbox"/>
+                        <label class="cbx" for="microState"><span>
+                        <svg width="12px" height="10px">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </svg></span><span>Micro</span></label>
+                    </div>
+            
+                    <div class="checkbox">
+                        <input class="inp-cbx" id="videoState" name="videoState" type="checkbox"/>
+                        <label class="cbx" for="videoState"><span>
+                        <svg width="12px" height="10px">
+                        <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                        </svg></span><span>Video</span></label>
+                        
+                    </div>
+                </div>
 
+                <button class="sup-btn f-medium">Connect</button>
+            </form>
+
+            
+
+            <section class="initial-screen" id="initialScreen">
+                <ul class="active-lobbies" id="activeLobbies">
+                </ul>
+                <form class="initial-form" id="initialForm" >
+                    <button class="sup-btn f-medium semi" id="newCallBtn">Start new call</button>
+                    <div class="flex justify-end">
+                        <div class="input-field underline-anim">
+                            <input class="popup__text-input" type="text" name="codeInput" id="codeInput" placeholder=" ">
+                            <label class="popup__text-label" for="codeInput">code to connect</label>
+                        </div>
+                        <button class="sup-btn-circled" id="joinCallBtn"><img src="./img/send.svg" alt="connect"></button>
+                    </div>
+                    
+                    
+                    
+                </form>
+            </section>
+
+        </div>
     </div>
 </body>
 <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>

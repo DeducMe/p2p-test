@@ -27,7 +27,6 @@ const muteBtn = document.getElementById('muteBtn');
 const videoMuteBtn = document.getElementById('videoMuteBtn');
 const userMediaForm = document.getElementById('userMediaForm');
 
-
 muteBtn.addEventListener('click', toggleMicro);
 videoMuteBtn.addEventListener('click', toggleVideo);
 userMediaForm.addEventListener('submit', connectToLobby);
@@ -41,10 +40,13 @@ let playerNumber;
 let callActive = false;
 const myVideo = document.createElement('video')
     myVideo.muted = true
+    myVideo.classList.add('user-video')
 const peers = {}
 const myPeer = new Peer()
 let usersInRoom = []
-let myStream, connectedDevices, devicesState
+let myStream
+let connectedDevices = {}, devicesState ={}
+
 
 function createStream(stream, recall){
     addVideoStream(myVideo, stream)
@@ -53,6 +55,7 @@ function createStream(stream, recall){
     myPeer.on('call', call => {
         call.answer(stream)
         const video = document.createElement('video')
+        video.classList.add('user-video')
         call.on('stream', userVideoStream => {
             addVideoStream(video, userVideoStream)
         })
@@ -113,6 +116,8 @@ function connectToLobby(e){
         video: userMediaForm.videoState.checked,
         audio: userMediaForm.microState.checked
     }
+    userMediaForm.style.display = 'none'
+    callScreen.style.display = 'block'
 
     askForDevice()
     
@@ -120,7 +125,7 @@ function connectToLobby(e){
 
 function init(){
     initialScreen.style.display = 'none'
-    callScreen.style.display = 'block'
+    callScreen.style.display = 'none'
     userMediaForm.style.display = 'block'
 }
 
@@ -142,31 +147,33 @@ myPeer.on('open', id => {
 function toggleMicro(){
     micro = myStream.getTracks().find((item)=>item.kind === 'audio')
     if (!micro){
-        connectedDevices.audio = true
         askForDevice(true)
         return
     }
 
     if (micro.enabled){
         micro.enabled = false
+        muteBtn.classList.add('muted')
+
         return 
     }
     micro.enabled = true
-    
+    muteBtn.classList.remove('muted')
 }
 function toggleVideo(){
     video = myStream.getTracks().find((item)=>item.kind === 'video')
     if (!video){
-        connectedDevices.video = true
         askForDevice(true)
         return
     }
 
     if (video.enabled){
         video.enabled = false
+        videoMuteBtn.classList.add('muted')
         return 
     }
     video.enabled = true
+    videoMuteBtn.classList.remove('muted')
 }
 
 function createEmptyAudioTrack(){
@@ -190,7 +197,7 @@ function createEmptyVideoTrack({ width, height }){
   
 function connectToNewUser(userId) {
     const video = document.createElement('video')
-
+    video.classList.add('user-video')
     let recconectInterval = setInterval(()=>{
         console.log('try connection')
         const call = myPeer.call(userId, myStream)
@@ -288,15 +295,19 @@ function joinExistingCall(e){
 function updateLobbies(lobbiesData){
     let result = {};
     let lobbiesField = ''
+    if (Object.keys(lobbiesData).length === 0){
+        activeLobbies.innerHTML = 'No active lobbies...'
+        return
+    }
     for (let [key, value] of Object.entries(lobbiesData)) {
         if (result[value]) result[value].push(key)
         else result[value] = [key]
     }
     Object.keys(result).forEach((key) => {
         lobbiesField +=
-        `<li onclick="joinCallByLobby('${key}')">
+        `<li class="rounded" onclick="joinCallByLobby('${key}')">
             <span>${key}</span>
-            <span>${result[key].length}</span>
+            <span class="lobby-user-amount">${result[key].length}</span>
         </li>`
     });
     activeLobbies.innerHTML = lobbiesField

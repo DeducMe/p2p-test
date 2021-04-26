@@ -1,0 +1,135 @@
+.visually-hidden{
+    position: absolute !important;
+
+    overflow: hidden;
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);/*IE6,IE7*/
+
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+
+    border: 0 !important;
+}
+
+h1,
+h2,
+h3,
+h4{
+    margin: 0;
+}
+
+h1{
+   font-size: 3rem;
+}
+
+h2{
+    font-size: 1.5rem;
+}
+
+
+*{
+    font-family: 'Nunito';
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    outline: none;
+}
+
+body{
+    background-color: #EFF5FF;
+    
+}
+
+a{
+    position: relative;
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button{
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+}
+
+ul{
+    list-style: none;
+}
+
+input,
+textarea{
+    border: none;
+    background-color: inherit;
+}
+
+.bold{
+    font-weight: 700;
+}
+
+.semi{
+    font-weight: 600;
+}
+
+.f-pre{
+    font-size: 1.1rem;
+}
+
+.f-medium{
+    font-size: 1.25rem;
+}
+
+.f-large{
+    font-size: 1.7rem;
+}
+
+.f-extra-large{
+    font-size: 2.5rem;
+}
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+    box-shadow: 0 0 0 30px white inset !important;
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
+/* Smartphones */
+@media (max-width : 768px) {
+    *{
+        font-size: 10px;
+    }
+
+    body, html {
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+}
+
+/* Tablets */
+@media (max-width : 1024px) {
+    *{
+        font-size: 12px;
+    }
+}
+
+/* Large screens */
+@media (min-width : 1824px) {
+}
+
+@media (min-width: 1024px) {
+    html {
+        width:100vw;
+        overflow-x:hidden;
+    }
+  }
