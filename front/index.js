@@ -180,7 +180,7 @@ socket.on('userDisconnect', disconnectedUserId => {
 
     peers[disconnectedUserId].close()
     delete peers[disconnectedUserId]
-    document.getElementById(disconnectedUserId)?.remove()
+    document.getElementById(disconnectedUserId)?.parentElement.remove()
     console.log(peers)
 
 })
