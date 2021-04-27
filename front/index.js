@@ -54,8 +54,11 @@ myPeer.on('open', id => {
 })
 
 navigator.mediaDevices.getUserMedia({
-    video: true,
     audio: true
+})
+
+navigator.mediaDevices.getUserMedia({
+    video: true
 })
 
 function createStream(stream, recall){
