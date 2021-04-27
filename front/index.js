@@ -6,11 +6,16 @@ const GRID_SIZE = 100;
 let SIZE;
 const socket = io('https://video-test-p2p.herokuapp.com/');
 // const socket = io('http://localhost:5000/');
+try{
+    navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+    })
+}
+catch{
+    console.log('device not found')
+}
 
-navigator.mediaDevices.getUserMedia({
-    audio: true,
-    video: true
-})
 
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
