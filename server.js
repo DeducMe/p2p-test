@@ -17,6 +17,7 @@ const io = require("socket.io")(server, {
 
 let state = {}  
 let clientRooms = {}
+let userNames = {}
 
 const { makeid } = require('./utils');
 
@@ -31,12 +32,25 @@ io.on('connection', client => {
     client.on('keydown', handleKeyDown)
     client.on('newCall', handleNewCall)
     client.on('joinCall', handleJoinCall)
-
+    client.on('addUserName', handleAddUserName)
+    client.on('getUserName', handleGetUserName)
+    
     client.emit('updateLobbies', clientRooms);
 
     function setId(id){
         userId = id
     }
+    
+    function handleGetUserName(id){
+        client.emit('updateUserNames', userNames[clientRooms[id]]);     
+    }
+
+    function handleAddUserName(userName, id){
+        userNames[clientRooms[id]] ? 
+        userNames[clientRooms[id]].push({'id':id, 'name':userName})
+        : userNames[clientRooms[id]] = [{'id':id, 'name':userName}]      
+    }
+
     function handleJoinCall(roomName, userId){
         const rooms = io.sockets.adapter.rooms
         let numClients = 0;

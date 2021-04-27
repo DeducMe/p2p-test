@@ -7,12 +7,18 @@ let SIZE;
 const socket = io('https://video-test-p2p.herokuapp.com/');
 // const socket = io('http://localhost:5000/');
 
+navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true
+})
+
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
 socket.on('callOver', handleCallOver);
 socket.on('callCode', handleCallCode);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 socket.on('updateLobbies', updateLobbies);
+socket.on('updateUserNames', updateUserNames);
 
 const initialScreen = document.getElementById('initialScreen');
 const callScreen = document.getElementById('callScreen');
@@ -34,67 +40,81 @@ userMediaForm.addEventListener('submit', connectToLobby);
 newCallBtn.addEventListener('click', startNewCall);
 joinCallBtn.addEventListener('click', joinExistingCall);
 
+const myVideo = document.createElement('video')
+myVideo.muted = true
+myVideo.classList.add('user-video')
+const myWrapper = document.createElement('div');
+const myNameLabel = document.createElement('span')
+myNameLabel.classList.add('user-name')
+
+let userName = ''
+
 let userId
 let playerNumber;
 let callActive = false;
-const myVideo = document.createElement('video')
-    myVideo.muted = true
-    myVideo.classList.add('user-video')
+
 const peers = {}
-let usersInRoom = []
+const myPeer = new Peer()
 let myStream
 let connectedDevices = {}, devicesState = {}
-navigator.mediaDevices.getUserMedia({
-    audio: true
-})
-
-navigator.mediaDevices.getUserMedia({
-    video: true
-})
-
-const myPeer = new Peer()
-
+    
 myPeer.on('open', id => {
     userId = id
+
+    myVideo.id = id
+    myNameLabel.id = `nameLabel${id}`
+    myWrapper.appendChild(myVideo);
+    myWrapper.appendChild(myNameLabel);
+    
     socket.emit('openConnection', id)
     
     console.log(`my ID is ${id}`)
 })
 
 
+function updateUserNames(userNames){
+    userNames.forEach((user)=>{
+        const label = document.getElementById(`nameLabel${user.id}`)
+        if (label) label.innerText = user.name
+    })
+}
 
 function createStream(stream, recall){
-    addVideoStream(myVideo, stream)
+    socket.emit('addUserName', userName, userId)
+
+    addVideoStream(myWrapper, myVideo, stream)
     myStream = stream
 
     myPeer.on('call', call => {
         console.log(`I answered the call`)
 
         call.answer(stream)
+
+        const wrapper = document.createElement('div');
         const video = document.createElement('video')
+        const nameLabel = document.createElement('span')
+        nameLabel.classList.add('user-name')
         video.classList.add('user-video')
         video.id = call.peer
+        nameLabel.id = `nameLabel${call.peer}`
+        wrapper.appendChild(video);
+        wrapper.appendChild(nameLabel);
 
         call.on('stream', userVideoStream => {
             console.log(`I recieved another user stream`)
             
-            addVideoStream(video, userVideoStream)
+            addVideoStream(wrapper, video, userVideoStream)
         })
         peers[call.peer] = call
     })
     
     socket.on('user-connected', id => {
-        usersInRoom.push(id)
         connectToNewUser(id)
     })
 
     callActive = true
     if (!devicesState.video) toggleVideo()
     if (!devicesState.audio) toggleMicro()
-
-    if (recall) usersInRoom.forEach((id)=>{
-        connectToNewUser(id)
-    })
 }
 
 function askForDevice(recall){
@@ -140,9 +160,8 @@ function connectToLobby(e){
     }
     userMediaForm.style.display = 'none'
     callScreen.style.display = 'block'
-
+    userName = userMediaForm.nameInput.value
     askForDevice()
-    
 }
 
 function init(){
@@ -153,7 +172,6 @@ function init(){
 
 socket.on('userDisconnect', disconnectedUserId => {
     console.log(`${disconnectedUserId} disconnected`)
-    usersInRoom.splice(usersInRoom.findIndex((id)=>id===disconnectedUserId), 1)
 
     peers[disconnectedUserId].close()
     delete peers[disconnectedUserId]
@@ -215,9 +233,16 @@ function createEmptyVideoTrack({ width, height }){
 };
   
 function connectToNewUser(id) {
+    const wrapper = document.createElement('div');
     const video = document.createElement('video')
+    const nameLabel = document.createElement('span')
+    nameLabel.classList.add('user-name')
+
     video.classList.add('user-video')
     video.id = id
+    nameLabel.id = `nameLabel${id}`
+    wrapper.appendChild(video);
+    wrapper.appendChild(nameLabel);
     
     let recconectInterval = setInterval(()=>{
         console.log('try connection')
@@ -226,7 +251,7 @@ function connectToNewUser(id) {
         call.on('stream', userVideoStream => {
             console.log('added')
             clearInterval(recconectInterval);
-            addVideoStream(video, userVideoStream)
+            addVideoStream(wrapper, video, userVideoStream)
         })
         call.on('close', () => {
             console.log('removed')
@@ -239,12 +264,13 @@ function connectToNewUser(id) {
 
 }
   
-function addVideoStream(video, stream) {
+function addVideoStream(wrapper, video, stream) {
     video.srcObject = stream
     video.addEventListener('loadedmetadata', () => {
         video.play()
     })
-    videoGrid.append(video)
+    videoGrid.append(wrapper)
+    socket.emit('getUserName', userId)
 }
 
 function handleSocketInit(number){
