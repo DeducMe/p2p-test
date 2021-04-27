@@ -41,18 +41,9 @@ const myVideo = document.createElement('video')
     myVideo.muted = true
     myVideo.classList.add('user-video')
 const peers = {}
-const myPeer = new Peer()
 let usersInRoom = []
 let myStream
 let connectedDevices = {}, devicesState = {}
-    
-myPeer.on('open', id => {
-    userId = id
-    socket.emit('openConnection', id)
-    
-    console.log(`my ID is ${id}`)
-})
-
 navigator.mediaDevices.getUserMedia({
     audio: true
 })
@@ -60,6 +51,17 @@ navigator.mediaDevices.getUserMedia({
 navigator.mediaDevices.getUserMedia({
     video: true
 })
+
+const myPeer = new Peer()
+
+myPeer.on('open', id => {
+    userId = id
+    socket.emit('openConnection', id)
+    
+    console.log(`my ID is ${id}`)
+})
+
+
 
 function createStream(stream, recall){
     addVideoStream(myVideo, stream)
