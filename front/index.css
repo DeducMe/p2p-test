@@ -281,6 +281,8 @@
 .user-video{
     flex:1;
     padding: 10px;
+    background-image: url('./img/placeholder-avatar.jpg');
+    background-size: cover;
 }
 
 video {
