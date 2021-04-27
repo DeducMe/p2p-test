@@ -8,8 +8,8 @@ var server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
-      origin: "https://video-test-p2p.herokuapp.com/",
-    //   origin: "http://localhost:5000/",
+    //   origin: "https://video-test-p2p.herokuapp.com/",
+      origin: "http://localhost:5000/",
       methods: ["GET", "POST"],
       credentials: true,
     }
@@ -23,19 +23,19 @@ const { makeid } = require('./utils');
 app.get('/', (req, res) => res.sendFile(path.resolve(__dirname, 'front', 'index.html')))
 
 io.on('connection', client => {
-    console.log('connected')
     let userId
+
     client.on('disconnect', handleDisconnectUser)
     client.on('disconnectUser', handleDisconnectUser)
     client.on('openConnection', setId)
     client.on('keydown', handleKeyDown)
     client.on('newCall', handleNewCall)
     client.on('joinCall', handleJoinCall)
+
     client.emit('updateLobbies', clientRooms);
 
     function setId(id){
         userId = id
-
     }
     function handleJoinCall(roomName, userId){
         const rooms = io.sockets.adapter.rooms
