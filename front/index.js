@@ -88,7 +88,7 @@ function createStream(stream, recall){
 }
 
 function askForDevice(recall){
-    const emptyMediaStream = new MediaStream([createEmptyAudioTrack(), createEmptyVideoTrack({ width:640, height:480 })]);
+    const emptyMediaStream = new MediaStream([createEmptyAudioTrack(), createEmptyVideoTrack({ width:640, height:640 })]);
     
     navigator.mediaDevices.getUserMedia({
         video: true,
