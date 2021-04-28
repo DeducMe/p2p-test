@@ -4,8 +4,8 @@ const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 100;
 
 let SIZE;
-// const socket = io('https://video-test-p2p.herokuapp.com/');
-const socket = io('http://localhost:5000/');
+const socket = io('https://video-test-p2p.herokuapp.com/');
+// const socket = io('http://localhost:5000/');
 navigator.mediaDevices.getUserMedia({
     audio: true,
     video: true
