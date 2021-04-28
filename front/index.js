@@ -1,11 +1,5 @@
-const BG_COLOR = '#231f20';
-const SNAKE_COLOR = '#c2c2c2';
-const FOOD_COLOR = '#e66916';
-const GRID_SIZE = 100;
-
-let SIZE;
-const socket = io('https://video-test-p2p.herokuapp.com/');
-// const socket = io('http://localhost:5000/');
+// const socket = io('https://video-test-p2p.herokuapp.com/');
+const socket = io('http://localhost:5000/');
 navigator.mediaDevices.getUserMedia({
     audio: true,
     video: true
@@ -16,7 +10,6 @@ navigator.mediaDevices.getUserMedia({
 
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
-socket.on('callOver', handleCallOver);
 socket.on('callCode', handleCallCode);
 socket.on('tooManyPlayers', handleTooManyPlayers);
 socket.on('updateLobbies', updateLobbies);
@@ -34,7 +27,9 @@ const videoGrid = document.getElementById('video-grid')
 const muteBtn = document.getElementById('muteBtn');
 const videoMuteBtn = document.getElementById('videoMuteBtn');
 const userMediaForm = document.getElementById('userMediaForm');
+const quitBtn = document.getElementById('quitBtn');
 
+quitBtn.addEventListener('click', handleQuitBtn);
 muteBtn.addEventListener('click', toggleMicro);
 videoMuteBtn.addEventListener('click', toggleVideo);
 userMediaForm.addEventListener('submit', connectToLobby);
@@ -51,12 +46,12 @@ myNameLabel.classList.add('user-name')
 
 let userName = ''
 
-let userId
+let userId, bufJoinCode
 let playerNumber;
 let callActive = false;
 
-const peers = {}
-const myPeer = new Peer()
+let peers = {}
+let myPeer = new Peer()
 let myStream
 let connectedDevices = {}, devicesState = {}
     
@@ -89,6 +84,7 @@ function createStream(stream){
     myStream = stream
 
     myPeer.on('call', call => {
+        // if (call.peer === Object.keys(peers).find((peerId) => call.peer===peerId)) return
         console.log(`I answered the call`)
 
         call.answer(stream)
@@ -137,8 +133,6 @@ async function askForDevice(){
             audio: true
         })
         console.log('with audio and video')
-
-
     }
     catch{
         try{
@@ -149,12 +143,8 @@ async function askForDevice(){
                 audio: true
             })
             console.log('with audio')
-
-
         }
-        catch{
-            
-        }
+        catch{}
     }
     finally{
 
@@ -178,10 +168,19 @@ function connectToLobby(e){
     callScreen.style.display = 'block'
     userName = userMediaForm.nameInput.value
     console.log('connection to lobby')
+    console.log(`bufJoinCode is ${bufJoinCode}`)
+    if (bufJoinCode) socket.emit('joinCall', bufJoinCode)
+    else socket.emit('newCall')
+
     askForDevice()
 }
 
 function init(){
+    playerNumber = null;
+    codeInput.value = "";
+    callCodeDisplay.innerText = "";
+    videoGrid.innerHTML = ""
+
     initialScreen.style.display = 'none'
     callScreen.style.display = 'none'
     userMediaForm.style.display = 'block'
@@ -189,11 +188,20 @@ function init(){
 
 socket.on('userDisconnect', disconnectedUserId => {
     console.log(`${disconnectedUserId} disconnected`)
-
-    peers[disconnectedUserId].close()
-    delete peers[disconnectedUserId]
-    document.getElementById(disconnectedUserId)?.parentElement.remove()
     console.log(peers)
+    let removeInterval = setInterval(()=>{
+        try{
+            peers[disconnectedUserId].close()
+            document.getElementById(disconnectedUserId)?.parentElement.remove()
+            delete peers[disconnectedUserId]
+            console.log(peers)
+            clearInterval(removeInterval);
+        }
+        catch(e){
+            console.log('trying to remove')
+        }
+    }, 100)
+    
 })
 
 
@@ -242,6 +250,7 @@ function createEmptyVideoTrack({ width, height }){
 };
   
 function connectToNewUser(id) {
+    if (Object.keys(peers).find((peerId) => peerId === id)) return
     const wrapper = document.createElement('div');
     const video = document.createElement('video')
     const nameLabel = document.createElement('span')
@@ -253,23 +262,20 @@ function connectToNewUser(id) {
     wrapper.appendChild(video);
     wrapper.appendChild(nameLabel);
     
-    let recconectInterval = setInterval(()=>{
-        console.log('try connection')
-        const call = myPeer.call(id, myStream)
+    console.log('try connection')
+    const call = myPeer.call(id, myStream)
 
-        call.on('stream', userVideoStream => {
-            console.log('added')
-            clearInterval(recconectInterval);
-            addVideoStream(wrapper, video, userVideoStream)
-        })
-        call.on('close', () => {
-            console.log('removed')
-            clearInterval(recconectInterval);
-            video.remove()
-        })
-        peers[id] = call
+    call.on('stream', userVideoStream => {
+        console.log('added')
+        console.log(`users in lobby`, peers)
+        addVideoStream(wrapper, video, userVideoStream)
+    })
+    call.on('close', () => {
+        console.log('removed')
+        video.remove()
+    })
+    peers[id] = call
 
-    }, 3000)
 
 }
   
@@ -293,17 +299,13 @@ function handleCallState(callState){
     requestAnimationFrame(() => paintCall(callState))
 }
 
-function handleCallOver(data){
+function handleQuitBtn(){
     if (!callActive) return
+    peers = {}
+    myPeer = new Peer()
+    reset()
 
-    data = JSON.parse(data);
-    console.log(data, playerNumber)
-    if (data.looser === playerNumber){
-        callActive = false
-        socket.emit('disconnectUser')
-        reset();
-    }
-
+    socket.emit('disconnectUser')
 }
 
 function handleUnknownCall(){
@@ -317,34 +319,35 @@ function handleTooManyPlayers(){
     
 }
 
-function reset() {
+function reset(){
+    bufJoinCode = ''
     playerNumber = null;
     codeInput.value = "";
     callCodeDisplay.innerText = "";
+    videoGrid.innerHTML = ""
+
     initialScreen.style.display = "block";
     callScreen.style.display = "none"
 }
 
 function handleCallCode(callCode){
     callCodeDisplay.innerText = callCode
+    bufJoinCode = callCode
 }
 
 function startNewCall(e){
     e.preventDefault()
-
-    socket.emit('newCall')
     init()
 }
 
 function joinCallByLobby(lobbyName){
-    socket.emit('joinCall', lobbyName, userId)
+    bufJoinCode = lobbyName
     init()
 }
 
 function joinExistingCall(e){
     e.preventDefault()
-    const code = codeInput.value
-    socket.emit('joinCall', code)
+    bufJoinCode = codeInput.value
     init()
 }
 

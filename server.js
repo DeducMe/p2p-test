@@ -8,8 +8,8 @@ var server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
-      origin: "https://video-test-p2p.herokuapp.com/",
-    //   origin: "http://localhost:5000/",
+    //   origin: "https://video-test-p2p.herokuapp.com/",
+      origin: "http://localhost:5000/",
       methods: ["GET", "POST"],
       credentials: true,
     }
@@ -51,7 +51,7 @@ io.on('connection', client => {
         : userNames[clientRooms[id]] = [{'id':id, 'name':userName}]      
     }
 
-    function handleJoinCall(roomName, userId){
+    function handleJoinCall(roomName){
         const rooms = io.sockets.adapter.rooms
         let numClients = 0;
 
@@ -79,7 +79,6 @@ io.on('connection', client => {
 
         io.sockets.in(clientRooms[userId])
         .emit('userDisconnect', userId);
-        console.log(clientRooms, userId)
         delete clientRooms[userId]
         io.emit('updateLobbies', clientRooms);
     }
