@@ -4,18 +4,15 @@ const FOOD_COLOR = '#e66916';
 const GRID_SIZE = 100;
 
 let SIZE;
-const socket = io('https://video-test-p2p.herokuapp.com/');
-// const socket = io('http://localhost:5000/');
-try{
-    navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-    })
-}
-catch{
+// const socket = io('https://video-test-p2p.herokuapp.com/');
+const socket = io('http://localhost:5000/');
+navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true
+})
+.catch(err=>{
     console.log('device not found')
-}
-
+})
 
 socket.on('init', handleSocketInit);
 socket.on('callState', handleCallState);
@@ -84,7 +81,8 @@ function updateUserNames(userNames){
     })
 }
 
-function createStream(stream, recall){
+function createStream(stream){
+    console.log('myStreamCreated')
     socket.emit('addUserName', userName, userId)
 
     addVideoStream(myWrapper, myVideo, stream)
@@ -114,6 +112,7 @@ function createStream(stream, recall){
     })
     
     socket.on('user-connected', id => {
+        console.log(`${id} connected`)
         connectToNewUser(id)
     })
 
@@ -122,35 +121,47 @@ function createStream(stream, recall){
     if (!devicesState.audio) toggleMicro()
 }
 
-function askForDevice(recall){
+function chainError(err) {
+    return Promise.reject(err)
+};
+
+async function askForDevice(){
+    console.log('asked for device')
     const emptyMediaStream = new MediaStream([createEmptyAudioTrack(), createEmptyVideoTrack({ width:640, height:640 })]);
-    
-    navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-    })
-    .then(stream => {
+    let stream;
+    try{
         connectedDevices.audio = true
         connectedDevices.video = true
-        createStream(stream, recall)
-        return
-    })
-    .catch(error => {
-        navigator.mediaDevices.getUserMedia({
-            audio: true,
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
         })
-        .then(stream => {
+        console.log('with audio and video')
+
+
+    }
+    catch{
+        try{
             connectedDevices.audio = true
             connectedDevices.video = false
-            createStream(stream, recall)
-            return
-        })
-        .catch(error => {
-            connectedDevices.audio = false
-            connectedDevices.video = false
-            createStream(emptyMediaStream, recall)
-        });
-    });
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: false,
+                audio: true
+            })
+            console.log('with audio')
+
+
+        }
+        catch{
+            
+        }
+    }
+    finally{
+
+        connectedDevices.audio = false
+        connectedDevices.video = false
+        createStream(stream || emptyMediaStream)
+    }
 }
 
 function connectToLobby(e){
@@ -166,6 +177,7 @@ function connectToLobby(e){
     userMediaForm.style.display = 'none'
     callScreen.style.display = 'block'
     userName = userMediaForm.nameInput.value
+    console.log('connection to lobby')
     askForDevice()
 }
 
@@ -182,21 +194,16 @@ socket.on('userDisconnect', disconnectedUserId => {
     delete peers[disconnectedUserId]
     document.getElementById(disconnectedUserId)?.parentElement.remove()
     console.log(peers)
-
 })
 
 
 function toggleMicro(){
     micro = myStream.getTracks().find((item)=>item.kind === 'audio')
-    if (!micro){
-        askForDevice(true)
-        return
-    }
+    if (!micro) return
 
     if (micro.enabled){
         micro.enabled = false
         muteBtn.classList.add('muted')
-
         return 
     }
     micro.enabled = true
@@ -204,10 +211,7 @@ function toggleMicro(){
 }
 function toggleVideo(){
     video = myStream.getTracks().find((item)=>item.kind === 'video')
-    if (!video){
-        askForDevice(true)
-        return
-    }
+    if (!video) return
 
     if (video.enabled){
         video.enabled = false
