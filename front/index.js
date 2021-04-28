@@ -275,8 +275,6 @@ function connectToNewUser(id) {
         video.remove()
     })
     peers[id] = call
-
-
 }
   
 function addVideoStream(wrapper, video, stream) {
