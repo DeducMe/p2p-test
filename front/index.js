@@ -23,6 +23,7 @@ const codeInput = document.getElementById('codeInput');
 const callCodeDisplay = document.getElementById('callCodeDisplay');
 const activeLobbies = document.getElementById('activeLobbies');
 const videoGrid = document.getElementById('video-grid')
+const lobbyNameInput = document.getElementById('lobbyNameInput');
 
 const muteBtn = document.getElementById('muteBtn');
 const videoMuteBtn = document.getElementById('videoMuteBtn');
@@ -164,19 +165,29 @@ function connectToLobby(e){
         video: userMediaForm.videoState.checked,
         audio: userMediaForm.microState.checked
     }
+    lobbyNameInput.style.display = 'none'
     userMediaForm.style.display = 'none'
     callScreen.style.display = 'block'
+    
     userName = userMediaForm.nameInput.value
     console.log('connection to lobby')
     console.log(`bufJoinCode is ${bufJoinCode}`)
     if (bufJoinCode) socket.emit('joinCall', bufJoinCode)
-    else socket.emit('newCall')
+    else{
+        socket.emit('newCall', lobbyNameInput.value)
+    } 
 
     askForDevice()
 }
 
 function init(){
     playerNumber = null;
+    lobbyNameInput.style.display = 'none'
+
+    if (bufNewLobby) {
+        lobbyNameInput.style.display = 'block'
+        bufNewLobby = false;
+    }
     codeInput.value = "";
     callCodeDisplay.innerText = "";
     videoGrid.innerHTML = ""
@@ -184,6 +195,7 @@ function init(){
     initialScreen.style.display = 'none'
     callScreen.style.display = 'none'
     userMediaForm.style.display = 'block'
+
 }
 
 socket.on('userDisconnect', disconnectedUserId => {
@@ -335,6 +347,7 @@ function handleCallCode(callCode){
 
 function startNewCall(e){
     e.preventDefault()
+    bufNewLobby = true 
     init()
 }
 

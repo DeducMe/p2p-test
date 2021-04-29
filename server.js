@@ -83,8 +83,7 @@ io.on('connection', client => {
         io.emit('updateLobbies', clientRooms);
     }
 
-    function handleNewCall(){
-        let roomName = makeid(5);
+    function handleNewCall(roomName){
         clientRooms[userId] = roomName;
 
         joinClient(client, roomName)
