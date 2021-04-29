@@ -50,6 +50,7 @@ let userName = ''
 let userId, bufJoinCode
 let playerNumber;
 let callActive = false;
+let bufNewLobby = false;
 
 let peers = {}
 let myPeer = new Peer()
@@ -168,7 +169,7 @@ function connectToLobby(e){
     lobbyNameInput.style.display = 'none'
     userMediaForm.style.display = 'none'
     callScreen.style.display = 'block'
-    
+
     userName = userMediaForm.nameInput.value
     console.log('connection to lobby')
     console.log(`bufJoinCode is ${bufJoinCode}`)
