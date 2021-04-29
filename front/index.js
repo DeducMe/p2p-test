@@ -166,7 +166,7 @@ function connectToLobby(e){
         video: userMediaForm.videoState.checked,
         audio: userMediaForm.microState.checked
     }
-    lobbyNameInput.style.display = 'none'
+    lobbyNameInput.parentElement.style.display = 'none'
     userMediaForm.style.display = 'none'
     callScreen.style.display = 'block'
 
@@ -183,10 +183,10 @@ function connectToLobby(e){
 
 function init(){
     playerNumber = null;
-    lobbyNameInput.style.display = 'none'
+    lobbyNameInput.parentElement.style.display = 'none'
 
     if (bufNewLobby) {
-        lobbyNameInput.style.display = 'block'
+        lobbyNameInput.parentElement.style.display = 'block'
         bufNewLobby = false;
     }
     codeInput.value = "";
