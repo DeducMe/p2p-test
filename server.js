@@ -15,11 +15,8 @@ const io = require("socket.io")(server, {
     }
 });
 
-let state = {}  
 let clientRooms = {}
 let userNames = {}
-
-const { makeid } = require('./utils');
 
 app.get('/', (req, res) => res.sendFile(path.resolve(__dirname, 'front', 'index.html')))
 
@@ -52,13 +49,6 @@ io.on('connection', client => {
     }
 
     function handleJoinCall(roomName){
-        const rooms = io.sockets.adapter.rooms
-        let numClients = 0;
-
-        if (rooms.has(roomName)) {
-            numClients = rooms.size - 2
-        }
-
         clientRooms[userId] = roomName
 
         joinClient(client, roomName)
@@ -88,30 +78,7 @@ io.on('connection', client => {
 
         joinClient(client, roomName)
     }
-
-    function handleKeyDown(keyCode){
-        const roomName = clientRooms[userId]
-
-        if (!roomName){
-            return
-        }
-
-        try{
-            keyCode = parseInt(keyCode);
-        }
-        catch(e){
-            console.error(e)
-            return
-        }
-        let player = state[roomName].players.find(player => player.id === userId)
-        if (player){
-            const vel = getUpdatedVelocity(player.vel, keyCode);
-            if (vel) {
-                player.vel = vel
-            }
-        }
-        
-    }
+    
 })
 
 
