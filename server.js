@@ -26,7 +26,6 @@ io.on('connection', client => {
     client.on('disconnect', handleDisconnectUser)
     client.on('disconnectUser', handleDisconnectUser)
     client.on('openConnection', setId)
-    client.on('keydown', handleKeyDown)
     client.on('newCall', handleNewCall)
     client.on('joinCall', handleJoinCall)
     client.on('addUserName', handleAddUserName)
