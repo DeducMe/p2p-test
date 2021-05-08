@@ -26,7 +26,6 @@ const videoGrid = document.getElementById('video-grid')
 const lobbyNameInput = document.getElementById('lobbyNameInput');
 const installPwa = document.getElementById('installPwa');
 
-
 const muteBtn = document.getElementById('muteBtn');
 const videoMuteBtn = document.getElementById('videoMuteBtn');
 const userMediaForm = document.getElementById('userMediaForm');
@@ -59,7 +58,9 @@ let myPeer = new Peer()
 let myStream
 let connectedDevices = {}, devicesState = {}
     
-let pwaPrompt
+let pwaPrompt;
+
+
 myPeer.on('open', id => {
     userId = id
 
@@ -80,10 +81,17 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 
 function installPwaApp(){
-    pwaPrompt.prompt()
-    pwaPrompt.userChoice.then((choiceResult)=>{
-        pwaPrompt = null
-    })
+    installPwa.style.display = 'none';
+    pwaPrompt.prompt();
+    pwaPrompt.userChoice
+    .then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+        } else {
+            console.log('User dismissed the A2HS prompt');
+        }
+        pwaPrompt = null;
+    });
 }
 
 
