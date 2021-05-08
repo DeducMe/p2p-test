@@ -41,8 +41,6 @@ joinCallBtn.addEventListener('click', joinExistingCall);
 
 const myVideo = document.createElement('video')
 myVideo.setAttribute('autoplay', '');
-myVideo.setAttribute('muted', '');
-
 myVideo.setAttribute('playsinline', '');
 myVideo.muted = true
 myVideo.classList.add('user-video')
@@ -123,7 +121,6 @@ function createStream(stream){
         const wrapper = document.createElement('div');
         const video = document.createElement('video')
         video.setAttribute('autoplay', '');
-        video.setAttribute('muted', '');
         video.setAttribute('playsinline', '');
         const nameLabel = document.createElement('span')
         nameLabel.classList.add('user-name')
@@ -302,7 +299,6 @@ function connectToNewUser(id) {
     const wrapper = document.createElement('div');
     const video = document.createElement('video')
     video.setAttribute('autoplay', '');
-    video.setAttribute('muted', '');
     video.setAttribute('playsinline', '');
     const nameLabel = document.createElement('span')
     nameLabel.classList.add('user-name')
