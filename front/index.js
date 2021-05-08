@@ -292,7 +292,7 @@ function createEmptyVideoTrack({ width, height }){
     return Object.assign(track, { enabled: false });
 };
   
-function connectToNewUser(id) {
+function connectToNewUser(id) { //problems
     if (Object.keys(peers).find((peerId) => peerId === id)) return
     const wrapper = document.createElement('div');
     const video = document.createElement('video')
@@ -310,7 +310,7 @@ function connectToNewUser(id) {
     console.log('try connection')
     const call = myPeer.call(id, myStream)
 
-    call.on('stream', userVideoStream => {
+    call.on('stream', userVideoStream => {  //проблема (не получает стрим)
         console.log('added')
         console.log(`users in lobby`, peers)
         addVideoStream(wrapper, video, userVideoStream)
