@@ -237,7 +237,7 @@ socket.on('userDisconnect', disconnectedUserId => {
     let removeInterval = setInterval(()=>{
         try{
             peers[disconnectedUserId].close()
-            document.getElementById(disconnectedUserId)?.parentElement.remove()
+            if (document.getElementById(disconnectedUserId)) document.getElementById(disconnectedUserId).parentElement.remove()
             delete peers[disconnectedUserId]
             console.log(peers)
             clearInterval(removeInterval);
