@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 const path = require('path');
 var https = require('https');
-
+var fs = require('fs');
 var options = {
     key: fs.readFileSync('./file.pem'),
     cert: fs.readFileSync('./file.crt')
