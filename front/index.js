@@ -306,20 +306,26 @@ function connectToNewUser(id) {
     nameLabel.id = `nameLabel${id}`
     wrapper.appendChild(video);
     wrapper.appendChild(nameLabel);
-    
-    console.log('try connection')
-    const call = myPeer.call(id, myStream)
+    let removeInterval = setInterval(()=>{
+        console.log('try connection')
+        const call = myPeer.call(id, myStream)
 
-    call.on('stream', userVideoStream => {
-        console.log('added')
-        console.log(`users in lobby`, peers)
-        addVideoStream(wrapper, video, userVideoStream)
-    })
-    call.on('close', () => {
-        console.log('removed')
-        video.remove()
-    })
-    peers[id] = call
+        call.on('stream', userVideoStream => {
+            console.log('added')
+            console.log(`users in lobby`, peers)
+            addVideoStream(wrapper, video, userVideoStream)
+            clearInterval(removeInterval);
+
+        })
+        call.on('close', () => {
+            console.log('removed')
+            video.remove()
+            clearInterval(removeInterval);
+
+        })
+        peers[id] = call
+    }, 100)
+    
 }
   
 function addVideoStream(wrapper, video, stream) {
