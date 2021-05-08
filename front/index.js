@@ -81,12 +81,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 
 function installPwaApp(){
-    installPwa.style.display = 'none';
     pwaPrompt.prompt();
     pwaPrompt.userChoice
     .then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
             console.log('User accepted the A2HS prompt');
+            installPwa.style.display = 'none';
+
         } else {
             console.log('User dismissed the A2HS prompt');
         }
