@@ -430,7 +430,8 @@ video {
     }
 
     #muteBtn,
-    #videoMuteBtn{
+    #videoMuteBtn,
+    #quitBtn{
         background-color: #fff;
     }
 
