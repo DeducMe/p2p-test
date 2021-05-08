@@ -278,9 +278,7 @@ function createEmptyAudioTrack(){
     const oscillator = ctx.createOscillator();
     const dst = oscillator.connect(ctx.createMediaStreamDestination());
     oscillator.start(0);
-    console.log(oscillator)
     const track = dst.stream.getAudioTracks()[0];
-    console.log(track, dst.stream.getAudioTracks())
     return Object.assign(track, { enabled: false });
 };
 
