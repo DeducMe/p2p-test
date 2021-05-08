@@ -276,6 +276,9 @@ function toggleVideo(){
 }
 
 function createEmptyAudioTrack(){
+    var AudioContext = window.AudioContext          // Default
+    || window.webkitAudioContext;  
+
     const ctx = new AudioContext();
     const oscillator = ctx.createOscillator();
     const dst = oscillator.connect(ctx.createMediaStreamDestination());
