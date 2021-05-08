@@ -2,13 +2,8 @@ var express = require('express');
 var app = express();
 const path = require('path');
 var http = require('http');
-var fs = require('fs');
 
-var options = {
-    key: fs.readFileSync('file.pem'),
-    cert: fs.readFileSync('file.crt')
-};
-var server = http.createServer(options, app);
+var server = http.createServer(app);
 
 app.set('port', (process.env.PORT || 5000));
 
