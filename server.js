@@ -3,9 +3,10 @@ var app = express();
 const path = require('path');
 var https = require('https');
 var fs = require('fs');
+
 var options = {
-    key: fs.readFileSync('./file.pem'),
-    cert: fs.readFileSync('./file.crt')
+    key: fs.readFileSync('file.pem'),
+    cert: fs.readFileSync('file.crt')
 };
 var server = https.createServer(options, app);
 
@@ -14,8 +15,8 @@ app.set('port', (process.env.PORT || 5000));
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
-      origin: "https://video-test-p2p.herokuapp.com/",
-    //   origin: "http://localhost:5000/",
+    //   origin: "https://video-test-p2p.herokuapp.com/",
+      origin: "https://localhost:5000/",
       methods: ["GET", "POST"],
       credentials: true,
     }
