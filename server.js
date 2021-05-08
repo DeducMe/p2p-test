@@ -15,8 +15,8 @@ app.set('port', (process.env.PORT || 5000));
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
-    //   origin: "https://video-test-p2p.herokuapp.com/",
-      origin: "https://localhost:5000/",
+      origin: "https://video-test-p2p.herokuapp.com/",
+    //   origin: "https://localhost:5000/",
       methods: ["GET", "POST"],
       credentials: true,
     }
