@@ -167,8 +167,7 @@ async function askForDevice(){
             audio: true
         })
         console.log('with audio and video')
-    }
-    catch{
+    }catch{
         try{
             connectedDevices.audio = true
             connectedDevices.video = false
@@ -177,8 +176,7 @@ async function askForDevice(){
                 audio: true
             })
             console.log('with audio')
-        }
-        catch{}
+        }catch{}
     }
     finally{
 
