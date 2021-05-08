@@ -1,10 +1,16 @@
 var express = require('express');
 var app = express();
 const path = require('path');
-var http = require('https');
+var https = require('https');
+
+var options = {
+    key: fs.readFileSync('./file.pem'),
+    cert: fs.readFileSync('./file.crt')
+};
+var server = https.createServer(options, app);
 
 app.set('port', (process.env.PORT || 5000));
-var server = http.createServer(app);
+
 app.use(express.static(path.join(__dirname, 'front')));
 const io = require("socket.io")(server, {
     cors: {
