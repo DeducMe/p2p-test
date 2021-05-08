@@ -238,7 +238,7 @@ socket.on('userDisconnect', disconnectedUserId => {
             clearInterval(removeInterval);
         }
         catch(e){
-            console.log('trying to remove')
+            console.log(`trying to remove ${disconnectedUserId}`)
         }
     }, 100)
     
