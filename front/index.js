@@ -35,7 +35,7 @@ quitBtn.addEventListener('click', handleQuitBtn);
 muteBtn.addEventListener('click', toggleMicro);
 videoMuteBtn.addEventListener('click', toggleVideo);
 userMediaForm.addEventListener('submit', connectToLobby);
-installPwa.addEventListener('submit', installPwaApp);
+installPwa.addEventListener('click', installPwaApp);
 newCallBtn.addEventListener('click', startNewCall);
 joinCallBtn.addEventListener('click', joinExistingCall);
 
