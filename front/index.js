@@ -2,7 +2,7 @@ const socket = io('https://video-test-p2p.herokuapp.com/');
 // const socket = io('https://localhost:5000/');
 navigator.mediaDevices.getUserMedia({
     audio: true,
-    video: true
+    video: { facingMode: "user" }
 })
 .catch(err=>{
     console.log('device not found')
@@ -40,8 +40,8 @@ newCallBtn.addEventListener('click', startNewCall);
 joinCallBtn.addEventListener('click', joinExistingCall);
 
 const myVideo = document.createElement('video')
-myVideo.setAttribute('autoplay', 'autoplay');
-myVideo.setAttribute('playsinline', 'playsinline');
+myVideo.setAttribute('autoplay', '');
+myVideo.setAttribute('playsinline', '');
 myVideo.muted = true
 myVideo.classList.add('user-video')
 const myWrapper = document.createElement('div');
@@ -120,8 +120,8 @@ function createStream(stream){
 
         const wrapper = document.createElement('div');
         const video = document.createElement('video')
-        video.setAttribute('autoplay', 'autoplay');
-        video.setAttribute('playsinline', 'playsinline');
+        video.setAttribute('autoplay', '');
+        video.setAttribute('playsinline', '');
         const nameLabel = document.createElement('span')
         nameLabel.classList.add('user-name')
         video.classList.add('user-video')
@@ -160,7 +160,7 @@ async function askForDevice(){
         connectedDevices.audio = true
         connectedDevices.video = true
         stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
+            video: { facingMode: "user" },
             audio: true
         })
         console.log('with audio and video')
@@ -295,8 +295,8 @@ function connectToNewUser(id) {
     if (Object.keys(peers).find((peerId) => peerId === id)) return
     const wrapper = document.createElement('div');
     const video = document.createElement('video')
-    video.setAttribute('autoplay', 'autoplay');
-    video.setAttribute('playsinline', 'playsinline');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('playsinline', '');
     const nameLabel = document.createElement('span')
     nameLabel.classList.add('user-name')
 
