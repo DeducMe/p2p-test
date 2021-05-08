@@ -40,6 +40,8 @@ newCallBtn.addEventListener('click', startNewCall);
 joinCallBtn.addEventListener('click', joinExistingCall);
 
 const myVideo = document.createElement('video')
+myVideo.setAttribute('autoplay', 'autoplay');
+myVideo.setAttribute('playsinline', 'playsinline');
 myVideo.muted = true
 myVideo.classList.add('user-video')
 const myWrapper = document.createElement('div');
@@ -118,6 +120,8 @@ function createStream(stream){
 
         const wrapper = document.createElement('div');
         const video = document.createElement('video')
+        video.setAttribute('autoplay', 'autoplay');
+        video.setAttribute('playsinline', 'playsinline');
         const nameLabel = document.createElement('span')
         nameLabel.classList.add('user-name')
         video.classList.add('user-video')
@@ -291,6 +295,8 @@ function connectToNewUser(id) {
     if (Object.keys(peers).find((peerId) => peerId === id)) return
     const wrapper = document.createElement('div');
     const video = document.createElement('video')
+    video.setAttribute('autoplay', 'autoplay');
+    video.setAttribute('playsinline', 'playsinline');
     const nameLabel = document.createElement('span')
     nameLabel.classList.add('user-name')
 
