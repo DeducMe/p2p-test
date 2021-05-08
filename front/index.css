@@ -114,6 +114,13 @@
     transform: translate(-50%, 0);
 }
 
+#installPwa{
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
 .input-field{
     position: relative;
 
