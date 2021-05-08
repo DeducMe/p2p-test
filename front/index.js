@@ -24,6 +24,8 @@ const callCodeDisplay = document.getElementById('callCodeDisplay');
 const activeLobbies = document.getElementById('activeLobbies');
 const videoGrid = document.getElementById('video-grid')
 const lobbyNameInput = document.getElementById('lobbyNameInput');
+const installPwa = document.getElementById('installPwa');
+
 
 const muteBtn = document.getElementById('muteBtn');
 const videoMuteBtn = document.getElementById('videoMuteBtn');
@@ -34,7 +36,7 @@ quitBtn.addEventListener('click', handleQuitBtn);
 muteBtn.addEventListener('click', toggleMicro);
 videoMuteBtn.addEventListener('click', toggleVideo);
 userMediaForm.addEventListener('submit', connectToLobby);
-
+installPwa.addEventListener('submit', installPwaApp);
 newCallBtn.addEventListener('click', startNewCall);
 joinCallBtn.addEventListener('click', joinExistingCall);
 
@@ -57,6 +59,7 @@ let myPeer = new Peer()
 let myStream
 let connectedDevices = {}, devicesState = {}
     
+let pwaPrompt
 myPeer.on('open', id => {
     userId = id
 
@@ -69,6 +72,19 @@ myPeer.on('open', id => {
     
     console.log(`my ID is ${id}`)
 })
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault()
+    pwaPrompt = e
+})
+
+
+function installPwaApp(){
+    pwaPrompt.prompt()
+    pwaPrompt.userChoice.then((choiceResult)=>{
+        pwaPrompt = null
+    })
+}
 
 
 function updateUserNames(userNames){
