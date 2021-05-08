@@ -1,18 +1,24 @@
 var express = require('express');
 var app = express();
 const path = require('path');
-var https = require('https');
+var http = require('http');
 var fs = require('fs');
 
 var options = {
     key: fs.readFileSync('file.pem'),
     cert: fs.readFileSync('file.crt')
 };
-var server = https.createServer(options, app);
+var server = http.createServer(options, app);
 
 app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(path.join(__dirname, 'front')));
+
+app.use(function(req, res, next) {
+    var reqType = req.headers["x-forwarded-proto"];
+    reqType == 'https' ? next() : res.redirect("https://" + req.headers.host + req.url);
+});
+
 const io = require("socket.io")(server, {
     cors: {
       origin: "https://video-test-p2p.herokuapp.com/",
