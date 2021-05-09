@@ -115,6 +115,7 @@ function createStream(stream){
     myPeer.on('call', call => {
         // if (call.peer === Object.keys(peers).find((peerId) => call.peer===peerId)) return
         console.log(`I answered the call`)
+        if (Object.keys(peers).any((peerId) => peerId === call.peer)) return 
 
         call.answer(stream)
 
@@ -314,8 +315,8 @@ function connectToNewUser(id) { //problems
 
         const call = myPeer.call(id, myStream)
         call.on('stream', userVideoStream => {  //проблема (не получает стрим)
-            if (Object.keys(peers).find((peerId) => peerId === id)) return console.log(`${id} already in`)
-
+            if (Object.keys(peers).any((peerId) => peerId === id)) return 
+            console.log(Object.keys(peers).any((peerId) => peerId === id))
             console.log('added')
             console.log(`users in lobby`, peers)
             peers[id] = call
