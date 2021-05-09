@@ -115,7 +115,7 @@ function createStream(stream){
     myPeer.on('call', call => {
         // if (call.peer === Object.keys(peers).find((peerId) => call.peer===peerId)) return
         console.log(`I answered the call`)
-        if (Object.keys(peers).any((peerId) => peerId === call.peer)) return 
+        if (Object.keys(peers).find((peerId) => peerId === call.peer)) return 
 
         call.answer(stream)
 
