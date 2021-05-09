@@ -29,21 +29,16 @@ let userNames = {}
 app.get('/', (req, res) => res.sendFile(path.resolve(__dirname, 'front', 'index.html')))
 
 io.on('connection', client => {
-    let userId
+    let userId = client.id
 
     client.on('disconnect', handleDisconnectUser)
     client.on('disconnectUser', handleDisconnectUser)
-    client.on('openConnection', setId)
     client.on('newCall', handleNewCall)
     client.on('joinCall', handleJoinCall)
     client.on('addUserName', handleAddUserName)
     client.on('getUserName', handleGetUserName)
     
     client.emit('updateLobbies', clientRooms);
-
-    function setId(id){
-        userId = id
-    }
     
     function handleGetUserName(id){
         client.emit('updateUserNames', userNames[clientRooms[id]]);     
