@@ -241,7 +241,7 @@ socket.on('userDisconnect', disconnectedUserId => {
         catch(e){
             console.log(`trying to remove ${disconnectedUserId}`)
         }
-    }, 100)
+    }, 1000)
     
 })
 
@@ -329,7 +329,7 @@ function connectToNewUser(id) { //problems
             console.log('removed')
             video.remove()
         })
-    }, 100)
+    }, 1000)
 
     
     
