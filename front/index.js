@@ -307,19 +307,29 @@ function connectToNewUser(id) { //problems
     wrapper.appendChild(video);
     wrapper.appendChild(nameLabel);
     
-    console.log('try connection')
-    const call = myPeer.call(id, myStream)
+   
 
-    call.on('stream', userVideoStream => {  //проблема (не получает стрим)
-        console.log('added')
-        console.log(`users in lobby`, peers)
-        addVideoStream(wrapper, video, userVideoStream)
-    })
-    call.on('close', () => {
-        console.log('removed')
-        video.remove()
-    })
-    peers[id] = call
+    let removeInterval = setInterval(()=>{
+        console.log('try connection')
+
+        const call = myPeer.call(id, myStream)
+        call.on('stream', userVideoStream => {  //проблема (не получает стрим)
+            if (Object.keys(peers).find((peerId) => peerId === id)) return
+
+            console.log('added')
+            console.log(`users in lobby`, peers)
+            peers[id] = call
+            addVideoStream(wrapper, video, userVideoStream)
+            clearInterval(removeInterval)
+        })
+        call.on('close', () => {
+            console.log('removed')
+            video.remove()
+        })
+    }, 100)
+
+    
+    
 }
   
 function addVideoStream(wrapper, video, stream) {
