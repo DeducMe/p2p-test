@@ -315,8 +315,10 @@ function connectToNewUser(id) { //problems
 
         const call = myPeer.call(id, myStream)
         call.on('stream', userVideoStream => {  //проблема (не получает стрим)
-            if (Object.keys(peers).find((peerId) => peerId === id)) return 
-            console.log(Object.keys(peers).any((peerId) => peerId === id))
+            if (Object.keys(peers).find((peerId) => peerId === id)) {
+                clearInterval(removeInterval)
+            }
+            
             console.log('added')
             console.log(`users in lobby`, peers)
             peers[id] = call
